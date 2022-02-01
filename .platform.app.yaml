@@ -1,0 +1,98 @@
+# This file describes an application. You can have multiple applications
+# in the same project.
+
+# The name of this app. Must be unique within a project.
+name: app
+
+# The runtime the application uses.
+type: "php:7.4"
+
+# Configuration of the build of the application.
+build:
+    flavor: composer
+
+dependencies:
+    php:
+      composer/composer: '^2'
+      wp-cli/wp-cli-bundle: "^2.1"
+      # wp-cli/find-command: "dev-master"
+      psy/psysh: "^0.8.4"
+
+hooks:
+    build: |
+        set -e
+        # Copy manually-provided plugins into the plugins directory.
+        # This allows manually-provided and composer-provided plugins to coexist.
+        rsync -a plugins/* wordpress/wp-content/plugins/
+        bash scripts/stage.sh build
+    deploy: |
+      bash scripts/stage.sh deploy
+
+# The relationships of the application with services or other applications.
+# The left-hand side is the name of the relationship as it will be exposed
+# to the application in the PLATFORM_RELATIONSHIPS variable. The right-hand
+# side is in the form `<service name>:<endpoint name>`.
+relationships:
+    database: "db:mysql"
+
+# The configuration of app when it is exposed to the web.
+web:
+    locations:
+        "/":
+            # The public directory of the app, relative to its root.
+            root: "/"
+            # The front-controller script to send non-static requests to.
+            passthru: "/index.php"
+            # Wordpress has multiple roots (wp-admin) so the following is required
+            index:
+                - "index.php"
+            # The number of seconds whitelisted (static) content should be cached.
+            expires: 600
+            scripts: true
+            allow: true
+            rules:
+                ^/composer\.json:
+                    allow: false
+                ^/license\.txt$:
+                    allow: false
+                ^/readme\.html$:
+                    allow: false
+        "/wp-content/cache":
+            root: "wp-content/cache"
+            scripts: false
+            allow: false
+        "/wp-content/uploads":
+            root: "wp-content/uploads"
+            scripts: false
+            allow: false
+            rules:
+                # Allow access to common static files.
+                '(?<!\-lock)\.(?i:jpe?g|gif|png|svg|bmp|ico|css|js(?:on)?|eot|ttf|woff|woff2|pdf|docx?|xlsx?|pp[st]x?|psd|odt|key|mp[2-5g]|m4[av]|og[gv]|wav|mov|wm[av]|avi|3g[p2])$':
+                    allow: true
+                    expires: 1w
+        "/vendor":
+            root: "vendor/"
+            scripts: false
+            allow: false
+
+# The size of the persistent disk of the application (in MB).
+disk: 2048
+
+# The mounts that will be performed when the package is deployed.
+mounts:
+    "wp-content/cache":
+        source: local
+        source_path: "cache"
+    "wp-content/uploads":
+        source: local
+        source_path: "uploads"
+
+source:
+  operations:
+    auto-update:
+      command: |
+        # dash is the default sh and <( is a bashism, so we have to execute the line in bash, so we can send output
+        # from curl to bash. my head hurts.
+        bash -c "bash <(curl -fsS https://raw.githubusercontent.com/gilzow/source-operations/main/setup.sh) sop-autoupdate"
+    test:
+      command: bash scripts/stage.sh sourceop

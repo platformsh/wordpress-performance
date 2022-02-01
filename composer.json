@@ -1,0 +1,14 @@
+{
+    "name": "platformsh/wordpress-performance",
+    "description": "clone of core.git.wordpress.org for testing performance degradation to core",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Paul Gilzow",
+            "email": "paul.gilzow@platform.sh"
+        }
+    ],
+    "require": {
+        "platformsh/config-reader": "^2.4"
+    }
+}
