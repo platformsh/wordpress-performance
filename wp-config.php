@@ -2,7 +2,7 @@
 
 use Platformsh\ConfigReader\Config;
 
-require __DIR__.'/vendor/autoload.php';
+require __DIR__.'/../vendor/autoload.php';
 
 // Create a new config object to ease reading the Platform.sh environment variables.
 // You can alternatively use getenv() yourself.
