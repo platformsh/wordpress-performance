@@ -24,7 +24,7 @@ hooks:
         if [ ! -d "web" ]; then
             mkdir "web"
         fi
-        (ls -d wp-*) | while read item; do
+        (ls -d -- wp-* index.php) | while read item; do
             if [ -d "${item}" ]; then
                 directory="yes"
             fi
