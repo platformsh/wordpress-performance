@@ -21,10 +21,16 @@ dependencies:
 hooks:
     build: |
         set -e
-        # Copy manually-provided plugins into the plugins directory.
-        # This allows manually-provided and composer-provided plugins to coexist.
-        rsync -a plugins/* wordpress/wp-content/plugins/
-        bash scripts/stage.sh build
+        if [ ! -d "web" ]; then
+            mkdir "web"
+        fi
+        (ls -d wp-*) | while read item; do
+            if [ -d "${item}" ]; then
+                directory="yes"
+            fi
+
+            cp ${directory+ -R } "${item}" "web/${item}"
+        done
     deploy: |
       bash scripts/stage.sh deploy
 
@@ -40,7 +46,7 @@ web:
     locations:
         "/":
             # The public directory of the app, relative to its root.
-            root: "."
+            root: "web"
             # The front-controller script to send non-static requests to.
             passthru: "/index.php"
             # Wordpress has multiple roots (wp-admin) so the following is required
