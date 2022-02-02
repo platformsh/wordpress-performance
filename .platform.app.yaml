@@ -32,7 +32,6 @@ hooks:
             cp ${directory+ -R } "${item}" "web/${item}"
         done
     deploy: |
-      bash scripts/stage.sh deploy
 
 # The relationships of the application with services or other applications.
 # The left-hand side is the name of the relationship as it will be exposed
