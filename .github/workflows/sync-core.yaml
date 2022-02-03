@@ -23,7 +23,7 @@ jobs:
                   GIT_EMAIL: ${{ secrets.GH_EMAIL }}
                   GIT_USER: ${{ secrets.GH_USER }}
               run: |
-                  updates=$(git log main..wpcore/main --oneline)
+                  updates=$(git log trunk..wpcore/trunk --oneline)
                   if [[ -n "${updates}" ]]; then
                     echo "::notice::Updates are available"
                     git config --global user.email "$GIT_EMAIL"
