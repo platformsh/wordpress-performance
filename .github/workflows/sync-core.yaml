@@ -1,0 +1,36 @@
+name: Sync trunk with WordPress core trunk
+on:
+    schedule:
+        # Run at every 15 minutes
+        - cron: '*/15 * * * *'
+    workflow_dispatch:
+jobs:
+    update-with-wp-core:
+        runs-on: ubuntu-latest
+        name: "Update with WP Core"
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  fetch-depth: 0
+            - id: add-git-remote
+              run: |
+                  git remote add wpcore git://core.git.wordpress.org/
+            - id: remote-update
+              run: |
+                  git remote update
+            - id: check-status
+              env:
+                  GIT_EMAIL: ${{ secrets.GH_EMAIL }}
+                  GIT_USER: ${{ secrets.GH_USER }}
+              run: |
+                  updates=$(git log main..wpcore/main --oneline)
+                  if [[ -n "${updates}" ]]; then
+                    echo "::notice::Updates are available"
+                    git config --global user.email "$GIT_EMAIL"
+                    git config --global user.name "$GIT_USER"
+                    git pull wpcore trunk --no-rebase --no-edit
+                    git push origin trunk
+                    echo "::notice::Trunk updated from WP Core trunk"
+                  else
+                    echo "::notice::No updates right now."
+                  fi

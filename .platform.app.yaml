@@ -32,6 +32,13 @@ hooks:
             cp ${directory+ -R } "${item}" "web/${item}"
         done
     deploy: |
+        # update the db if there were changes introduced in the last commit
+        wp core update-db
+        # Flush the object cache in case relevant changes were introduced in the last commit
+        wp cache flush
+    post_deploy:
+        #last run all the cron jobs that might have been schedules to run during the rebuild
+        wp cron event run --due-now
 
 # The relationships of the application with services or other applications.
 # The left-hand side is the name of the relationship as it will be exposed
