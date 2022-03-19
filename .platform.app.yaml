@@ -18,6 +18,10 @@ dependencies:
       # wp-cli/find-command: "dev-master"
       psy/psysh: "^0.8.4"
 
+runtime:
+    extensions:
+        - blackfire
+
 hooks:
     build: |
         set -e
