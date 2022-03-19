@@ -96,10 +96,10 @@ disk: 2048
 
 # The mounts that will be performed when the package is deployed.
 mounts:
-    "wp-content/cache":
+    "web/wp-content/cache":
         source: local
         source_path: "cache"
-    "wp-content/uploads":
+    "web/wp-content/uploads":
         source: local
         source_path: "uploads"
 
