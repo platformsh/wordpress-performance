@@ -78,7 +78,7 @@ web:
             scripts: false
             allow: false
         "/wp-content/uploads":
-            root: "wp-content/uploads"
+            root: "web/wp-content/uploads"
             scripts: false
             allow: false
             rules:
