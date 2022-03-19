@@ -35,6 +35,10 @@ hooks:
 
             cp ${directory+ -R } "${item}" "web/${item}"
         done
+        #temporary install of WP Importer
+        wget https://downloads.wordpress.org/plugin/wordpress-importer.0.7.zip -P web/wp-content/uploads
+        unzip web/wp-content/uploads/wordpress-importer.0.7.zip -d web/wp-content/plugins
+        rm web/wp-content/uploads/wordpress-importer.0.7.zip
     deploy: |
         # update the db if there were changes introduced in the last commit
         wp core update-db
