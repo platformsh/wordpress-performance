@@ -20,10 +20,10 @@ class Blackfire_Markers
 
         $blackfire_markers = new static();
 
-        foreach ($blackfire_markers->get_markable_hooks() as $hook_name => $hook_label) {
+        foreach ($blackfire_markers->get_markable_hooks() as $hook_name) {
             add_action($hook_name,
-                function () use ($hook_label) {
-                    \BlackfireProbe::addMarker($hook_label);
+                function () use ($hook_name) {
+                    \BlackfireProbe::addMarker("wordpress.$hook_name");
                 }
             );
         }
@@ -47,12 +47,12 @@ class Blackfire_Markers
      */
     public function get_markable_hooks(): iterable
     {
-        yield 'muplugins_loaded' => __('Must-use and network-activated plugins have loaded.');
-        yield 'plugins_loaded' => __('Activated plugins have loaded.');
-        yield 'setup_theme' => __('Before the theme is loaded.');
-        yield 'after_setup_theme' => __('After the theme is loaded.');
-        yield 'init' => __('WP finished loading but before any headers are sent.');
-        yield 'wp_loaded' => __('WP fully loaded.');
+        yield 'muplugins_loaded';
+        yield 'plugins_loaded';
+        yield 'setup_theme';
+        yield 'after_setup_theme';
+        yield 'init';
+        yield 'wp_loaded';
     }
 }
 
