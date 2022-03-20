@@ -35,11 +35,10 @@ hooks:
 
             cp ${directory+ -R } "${item}" "web/${item}"
         done
-        if [ ! -d "web/wp-content/mu-plugins" ]; then
-            mkdir web/wp-content/mu-plugins
+        if [ ! -L "web/wp-content/mu-plugins" ]; then
+            ln -nsf .plugins web/wp-content/mu-plugins
         fi
 
-        cp .plugins/blackfire.php web/wp-content/mu-plugins/
     deploy: |
         # update the db if there were changes introduced in the last commit
         wp core update-db
