@@ -44,6 +44,15 @@ class Blackfire_Markers
      * 'after_setup_theme',
      * 'init',
      * 'wp_loaded',
+     *
+     * Additional hooks used:
+     * parse_request
+     * parse_query
+     * pre_get_posts
+     * posts_clauses
+     * posts_selection
+     * wp
+     * template_redirect
      */
     public function get_markable_hooks(): iterable
     {
@@ -53,6 +62,12 @@ class Blackfire_Markers
         yield 'after_setup_theme';
         yield 'init';
         yield 'wp_loaded';
+        yield 'parse_request';
+        yield 'parse_query';
+        yield 'posts_clauses';
+        yield 'posts_selection';
+        yield 'wp';
+        yield 'template_redirect';
     }
 }
 
