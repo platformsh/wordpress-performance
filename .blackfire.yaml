@@ -1,5 +1,13 @@
-# Sample .blackfire.yaml file
-# Read more about .blackfire.yaml at https://blackfire.io/docs/testing-cookbooks/tests
+metrics:
+    wordpress.get_option:
+        label: "Wordpress GetOption"
+        matching_calls:
+            php:
+                - callee:
+                    selector: '=get_option'
+                    argument:
+                        1: '*'
+
 tests:
     "The homepage should be fast":
         path: "/"
