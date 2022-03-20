@@ -14,6 +14,16 @@ metrics:
                     argument:
                         1: '*'
 
+    wordpress.get_option.raw:
+        label: "Wordress GetOption RAW (SQL query based)"
+        matching_calls:
+            php:
+                - callee:
+                      selector: '=wpdb::query'
+                      argument:
+                          1: '/.+ from wp_options/'
+                  contrib: "count-only"
+
 tests:
     "The homepage should be fast":
         path: "/"
