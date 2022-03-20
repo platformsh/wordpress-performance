@@ -29,6 +29,9 @@ jobs:
                     git config --global user.email "$GIT_EMAIL"
                     git config --global user.name "$GIT_USER"
                     git pull wpcore trunk --no-rebase --no-edit
+                    git rev-parse HEAD > last.commit
+                    git add last.commit
+                    git commit -m "adds last commit hash to last.commit"
                     git push origin trunk
                     echo "::notice::Trunk updated from WP Core trunk"
                   else
