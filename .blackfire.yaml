@@ -1,4 +1,10 @@
 metrics:
+    wordpress.installed:
+        label: "Is WordPress installed?"
+        matching_calls:
+            php:
+                - callee: "=WP::main"
+
     wordpress.get_option:
         label: "Wordpress GetOption"
         matching_calls:
