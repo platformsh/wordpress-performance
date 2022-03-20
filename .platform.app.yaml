@@ -36,7 +36,7 @@ hooks:
             cp ${directory+ -R } "${item}" "web/${item}"
         done
         if [ ! -L "web/wp-content/mu-plugins" ]; then
-            ln -nsf /app/.plugins web/wp-content/mu-plugins
+            ln -nsf /app/.muplugins web/wp-content/mu-plugins
         fi
 
     deploy: |
