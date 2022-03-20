@@ -49,8 +49,12 @@ hooks:
         wp cron event run --due-now
 
         # run PageSpeed Insights test against the environment
+        # get default domain
         export BASE_URL=$(echo $PLATFORM_ROUTES | base64 --decode | jq -r 'to_entries[] | select(.value.primary==true) | .key')
-        curl https://www.googleapis.com/pagespeedonline/v5/runPagespeed\?url\=$BASE_URL\&key\=$GOOGLE_PSI_API_KEY
+        # get last commit hash
+        export COMMIT_HASH=$(cat last.commit)
+        # trigger test creation and reporting via external service api
+        curl -X POST --header 'Content-Type: application/json' -d '{"name": "'"$COMMIT_HASH"'","urls": ["'"$BASE_URL"'"]}' $GOOGLE_PSI_API_URL
 
 # The relationships of the application with services or other applications.
 # The left-hand side is the name of the relationship as it will be exposed
