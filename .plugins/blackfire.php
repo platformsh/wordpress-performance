@@ -7,8 +7,6 @@
  * License: MIT
  */
 
-use BlackfireProbe;
-
 class Blackfire_Markers
 {
     /**
@@ -16,16 +14,16 @@ class Blackfire_Markers
      */
     public static function init(): void
     {
-        if (false === method_exists(BlackfireProbe::class, 'addMarker')) {
+        if (false === method_exists(\BlackfireProbe::class, 'addMarker')) {
             return;
         }
 
         $blackfire_markers = new static();
 
-        foreach ($blackfire_markers->get_hooks() as $hook_name) {
+        foreach ($blackfire_markers->get_markable_hooks() as $hook_name => $hook_label) {
             add_action($hook_name,
-                function () use ($blackfire_markers, $hook_name) {
-                    $blackfire_markers->create_marker($hook_name);
+                function () use ($hook_label) {
+                    \BlackfireProbe::addMarker($hook_label);
                 }
             );
         }
@@ -47,42 +45,14 @@ class Blackfire_Markers
      * 'init',
      * 'wp_loaded',
      */
-    public function get_hooks(): array
+    public function get_markable_hooks(): iterable
     {
-        return array(
-            'muplugins_loaded',
-            'plugins_loaded',
-            'setup_theme',
-            'after_setup_theme',
-            'init',
-            'wp_loaded',
-        );
-    }
-
-    /**
-     * Put labels on all markers.
-     *
-     * @param  string  $hook_name
-     *
-     * @return string
-     */
-    public function get_marker_label(string $hook_name): string
-    {
-        $labels = array(
-            'muplugins_loaded'  => __('All must-use and network-activated plugins have loaded.'),
-            'plugins_loaded'    => __('Activated plugins have loaded.'),
-            'setup_theme'       => __('Before the theme is loaded.'),
-            'after_setup_theme' => __('After the theme is loaded.'),
-            'init'              => __('WordPress has finished loading but before any headers are sent.'),
-            'wp_loaded'         => __('WP, all plugins, and the theme are fully loaded and instantiated.'),
-        );
-
-        return sprintf('[%s] %s', $hook_name, $labels[$hook_name] ?? '');
-    }
-
-    public function create_marker(string $hook_name): void
-    {
-        BlackfireProbe::addMarker($this->get_marker_label($hook_name));
+        yield 'muplugins_loaded' => __('Must-use and network-activated plugins have loaded.');
+        yield 'plugins_loaded' => __('Activated plugins have loaded.');
+        yield 'setup_theme' => __('Before the theme is loaded.');
+        yield 'after_setup_theme' => __('After the theme is loaded.');
+        yield 'init' => __('WP finished loading but before any headers are sent.');
+        yield 'wp_loaded' => __('WP fully loaded.');
     }
 }
 
