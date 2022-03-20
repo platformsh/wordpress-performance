@@ -41,6 +41,26 @@ metrics:
                 - callee:
                       selector: "=WP_Query::setup_postdata"
 
+    wordpress.wp_query:
+        label: "WordPress wp_query"
+        timeline: true
+        matching_calls:
+            php:
+                - callee:
+                    selector: '=WP_Query::query'
+                    argument:
+                        1: '*'
+                        
+    wordpress.found_rows:
+        label: "WordPress SQL_CALC_FOUND_ROWS"
+        matching_calls:
+            php:
+                - callee:
+                    selector: '=wpdb::query'
+                    argument:
+                        1: '/.+ SQL_CALC_FOUND_ROWS/'
+                  contrib: "count-only"
+
 tests:
     "The homepage should be fast":
         path: "/"
