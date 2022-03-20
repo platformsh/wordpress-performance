@@ -56,6 +56,15 @@ tests:
         assertions:
             - "metrics.sql.queries.count <= 100"
 
+    "Regular plugins shouldn't take too long to load":
+        path: "/.*"
+        when: 'has_marker("wordpress.muplugins_loaded") and has_marker("wordpress.plugins_loaded")'
+        assertions:
+            # Should not exceed 50ms
+            - '(marker_time("wordpress.plugins_loaded") - marker_time("wordpress.muplugins_loaded")) <= 50ms'
+            # Should not exceed 10% of the wall_time
+            - '(marker_time("wordpress.plugins_loaded") - marker_time("wordpress.muplugins_loaded")) / main.wall_time < 0.1'
+
 # Read more about writing scenarios at https://blackfire.io/docs/builds-cookbooks/scenarios
 scenarios: |
     #!blackfire-player
