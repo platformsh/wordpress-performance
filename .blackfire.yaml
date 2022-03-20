@@ -34,6 +34,13 @@ metrics:
                           1: "=plugin_loaded"
                           2: "*"
 
+    wordpress.postdata_count:
+        label: "Count number of times setup_postdata is used"
+        matching_calls:
+            php:
+                - callee:
+                      selector: "=WP_Query::setup_postdata"
+
 tests:
     "The homepage should be fast":
         path: "/"
@@ -64,6 +71,11 @@ tests:
             - '(marker_time("wordpress.plugins_loaded") - marker_time("wordpress.muplugins_loaded")) <= 50ms'
             # Should not exceed 10% of the wall_time
             - '(marker_time("wordpress.plugins_loaded") - marker_time("wordpress.muplugins_loaded")) / main.wall_time < 0.1'
+
+    "Don't loop too many posts":
+        path: "/.*"
+        assertions:
+            - "metrics.wordpress.postdata_count.count <= 25"
 
 # Read more about writing scenarios at https://blackfire.io/docs/builds-cookbooks/scenarios
 scenarios: |
