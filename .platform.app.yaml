@@ -51,7 +51,8 @@ hooks:
 
         # run PageSpeed Insights test against the environment
         export BASE_URL=$(echo $PLATFORM_ROUTES | base64 --decode | jq -r 'to_entries[] | select(.value.primary==true) | .key')
-        curl https://www.googleapis.com/pagespeedonline/v5/runPagespeed\?url\=$BASE_URL\&key\=$GOOGLE_PSI_API_KEY
+        export COMMIT_HASH=$(cat last.commit)
+        curl -X POST --header 'Content-Type: application/json' -d '{"name": "'"$COMMIT_HASH"'","urls": ["'"$BASE_URL"'"]}' https://www.master-7rqtwti-hz474o6dfqbk2.de-2.platformsh.site/tests
 
 # The relationships of the application with services or other applications.
 # The left-hand side is the name of the relationship as it will be exposed
