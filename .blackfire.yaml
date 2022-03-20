@@ -30,6 +30,22 @@ tests:
         assertions:
             - "main.wall_time < 200ms"
 
+    "Number of calls to get_option should be reasonable":
+        path: "/.*"
+        assertions:
+            - "metrics.wordpress.get_option.count <= 50"
+
+    "The number of calls to wp_options table should be reasonable":
+        path: "/.*"
+        assertions:
+            - "metrics.wordpress.get_option.raw.count <= 25"
+
+    "Not too many SQL queries":
+        path: "/.*"
+        when: "metrics.wordpress.installed.count > 0"
+        assertions:
+            - "metrics.sql.queries.count <= 100"
+
 # Read more about writing scenarios at https://blackfire.io/docs/builds-cookbooks/scenarios
 scenarios: |
     #!blackfire-player
