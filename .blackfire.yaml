@@ -6,7 +6,7 @@ metrics:
                 - callee: "=WP::main"
 
     wordpress.get_option:
-        label: "Wordpress GetOption"
+        label: "WordPress get_option"
         matching_calls:
             php:
                 - callee:
@@ -15,7 +15,7 @@ metrics:
                         1: '*'
 
     wordpress.get_option.raw:
-        label: "Wordress GetOption RAW (SQL query based)"
+        label: "WordPress get_option RAW (SQL query based)"
         matching_calls:
             php:
                 - callee:
