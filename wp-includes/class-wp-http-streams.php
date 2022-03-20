@@ -206,12 +206,12 @@ class WP_Http_Streams {
 		stream_set_timeout( $handle, $timeout, $utimeout );
 
 		if ( $proxy->is_enabled() && $proxy->send_through_proxy( $url ) ) { // Some proxies require full URL in this field.
-			$requestPath = $url;
+			$request_path = $url;
 		} else {
-			$requestPath = $parsed_url['path'] . ( isset( $parsed_url['query'] ) ? '?' . $parsed_url['query'] : '' );
+			$request_path = $parsed_url['path'] . ( isset( $parsed_url['query'] ) ? '?' . $parsed_url['query'] : '' );
 		}
 
-		$strHeaders = strtoupper( $parsed_args['method'] ) . ' ' . $requestPath . ' HTTP/' . $parsed_args['httpversion'] . "\r\n";
+		$headers = strtoupper( $parsed_args['method'] ) . ' ' . $request_path . ' HTTP/' . $parsed_args['httpversion'] . "\r\n";
 
 		$include_port_in_host_header = (
 			( $proxy->is_enabled() && $proxy->send_through_proxy( $url ) )
@@ -220,34 +220,34 @@ class WP_Http_Streams {
 		);
 
 		if ( $include_port_in_host_header ) {
-			$strHeaders .= 'Host: ' . $parsed_url['host'] . ':' . $parsed_url['port'] . "\r\n";
+			$headers .= 'Host: ' . $parsed_url['host'] . ':' . $parsed_url['port'] . "\r\n";
 		} else {
-			$strHeaders .= 'Host: ' . $parsed_url['host'] . "\r\n";
+			$headers .= 'Host: ' . $parsed_url['host'] . "\r\n";
 		}
 
 		if ( isset( $parsed_args['user-agent'] ) ) {
-			$strHeaders .= 'User-agent: ' . $parsed_args['user-agent'] . "\r\n";
+			$headers .= 'User-agent: ' . $parsed_args['user-agent'] . "\r\n";
 		}
 
 		if ( is_array( $parsed_args['headers'] ) ) {
-			foreach ( (array) $parsed_args['headers'] as $header => $headerValue ) {
-				$strHeaders .= $header . ': ' . $headerValue . "\r\n";
+			foreach ( (array) $parsed_args['headers'] as $header => $header_value ) {
+				$headers .= $header . ': ' . $header_value . "\r\n";
 			}
 		} else {
-			$strHeaders .= $parsed_args['headers'];
+			$headers .= $parsed_args['headers'];
 		}
 
 		if ( $proxy->use_authentication() ) {
-			$strHeaders .= $proxy->authentication_header() . "\r\n";
+			$headers .= $proxy->authentication_header() . "\r\n";
 		}
 
-		$strHeaders .= "\r\n";
+		$headers .= "\r\n";
 
 		if ( ! is_null( $parsed_args['body'] ) ) {
-			$strHeaders .= $parsed_args['body'];
+			$headers .= $parsed_args['body'];
 		}
 
-		fwrite( $handle, $strHeaders );
+		fwrite( $handle, $headers );
 
 		if ( ! $parsed_args['blocking'] ) {
 			stream_set_blocking( $handle, 0 );
@@ -264,7 +264,7 @@ class WP_Http_Streams {
 		}
 
 		$strResponse  = '';
-		$bodyStarted  = false;
+		$body_started = false;
 		$keep_reading = true;
 		$block_size   = 4096;
 
@@ -296,11 +296,11 @@ class WP_Http_Streams {
 
 			while ( ! feof( $handle ) && $keep_reading ) {
 				$block = fread( $handle, $block_size );
-				if ( ! $bodyStarted ) {
+				if ( ! $body_started ) {
 					$strResponse .= $block;
 					if ( strpos( $strResponse, "\r\n\r\n" ) ) {
 						$processed_response = WP_Http::processResponse( $strResponse );
-						$bodyStarted        = true;
+						$body_started       = true;
 						$block              = $processed_response['body'];
 						unset( $strResponse );
 						$processed_response['body'] = '';
@@ -341,13 +341,13 @@ class WP_Http_Streams {
 				$block        = fread( $handle, $block_size );
 				$strResponse .= $block;
 
-				if ( ! $bodyStarted && strpos( $strResponse, "\r\n\r\n" ) ) {
+				if ( ! $body_started && strpos( $strResponse, "\r\n\r\n" ) ) {
 					$header_length = strpos( $strResponse, "\r\n\r\n" ) + 4;
-					$bodyStarted   = true;
+					$body_started  = true;
 				}
 
 				$keep_reading = (
-					! $bodyStarted
+					! $body_started
 					|| ! isset( $parsed_args['limit_response_size'] )
 					|| strlen( $strResponse ) < ( $header_length + $parsed_args['limit_response_size'] )
 				);
