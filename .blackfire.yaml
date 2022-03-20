@@ -24,6 +24,16 @@ metrics:
                           1: '/.+ from wp_options/'
                   contrib: "count-only"
 
+    wordpress.plugins.count:
+        label: "Count active plugins based on plugin_loaded hook"
+        matching_calls:
+            php:
+                - callee:
+                      selector: "=do_action"
+                      argument:
+                          1: "=plugin_loaded"
+                          2: "*"
+
 tests:
     "The homepage should be fast":
         path: "/"
