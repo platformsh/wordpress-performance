@@ -36,7 +36,7 @@ hooks:
             cp ${directory+ -R } "${item}" "web/${item}"
         done
         if [ ! -d "web/wp-contents/mu-plugins" ]; then
-            mkdir web/wp-contents/mu-plugins"
+            mkdir web/wp-contents/mu-plugins
         fi
 
         cp .plugins/blackfire.php web/wp-contents/mu-plugins/
