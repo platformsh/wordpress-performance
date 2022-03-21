@@ -101,8 +101,44 @@ tests:
 scenarios: |
     #!blackfire-player
 
+    name 'WordPress performance tests from CI'
+
     scenario
-        name 'The homepage should answer with a 200 status code'
+        name 'Basic pages'
 
         visit url('/')
+            name 'Homepage'
             expect status_code() == 200
+
+        visit url('/terms-of-service/')
+            name 'Terms of service'
+            expect status_code() == 200
+
+        click link('Sample Page')
+            name 'Sample Page'
+            expect status_code() == 200
+
+    scenario
+        name '2nd Article in the list'
+
+        visit url('/')
+            name 'Homepage'
+            blackfire false
+
+        click css('ul.wp-block-post-template > li:nth-child(2) a')
+
+        click css('.taxonomy-category a:nth-child(1)')
+
+    scenario
+        name 'Post a comment on the first article from the list'
+
+        visit url('/')
+            name 'Homepage'
+            blackfire false
+
+        click css('ul.wp-block-post-template > li:nth-child(1) a')
+
+        submit button('Post Comment')
+            param comment join(fake('paragraphs', 2), "\n\n")
+            param author 'Blackfire CI Bot'
+            param email 'blackfire@yopmail.com'
