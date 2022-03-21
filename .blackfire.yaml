@@ -126,8 +126,10 @@ scenarios: |
             blackfire false
 
         click css('ul.wp-block-post-template > li:nth-child(2) a')
+            expect status_code() == 200
 
         click css('.taxonomy-category a:nth-child(1)')
+            expect status_code() == 200
 
     scenario
         name 'Post a comment on the first article from the list'
@@ -135,8 +137,10 @@ scenarios: |
         visit url('/')
             name 'Homepage'
             blackfire false
+            expect status_code() == 200
 
         click css('ul.wp-block-post-template > li:nth-child(1) a')
+            expect status_code() == 200
 
         submit button('Post Comment')
             param comment join(fake('paragraphs', 2), "\n\n")
