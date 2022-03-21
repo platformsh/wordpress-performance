@@ -64,7 +64,6 @@ class Blackfire_Markers
         yield 'wp_loaded';
         yield 'parse_request';
         yield 'parse_query';
-        yield 'posts_clauses';
         yield 'posts_selection';
         yield 'wp';
         yield 'template_redirect';
