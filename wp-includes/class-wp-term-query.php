@@ -692,18 +692,18 @@ class WP_Term_Query {
 
 		$where = implode( ' AND ', $this->sql_clauses['where'] );
 
-		$pieces = compact( 'fields', 'join', 'where', 'distinct', 'orderby', 'order', 'limits' );
+		$clauses = compact( 'fields', 'join', 'where', 'distinct', 'orderby', 'order', 'limits' );
 
 		/**
 		 * Filters the terms query SQL clauses.
 		 *
 		 * @since 3.1.0
 		 *
-		 * @param string[] $pieces     Array of query SQL clauses.
+		 * @param string[] $clauses    Array of query SQL clauses.
 		 * @param string[] $taxonomies An array of taxonomy names.
 		 * @param array    $args       An array of term query arguments.
 		 */
-		$clauses = apply_filters( 'terms_clauses', $pieces, $taxonomies, $args );
+		$clauses = apply_filters( 'terms_clauses', $clauses, $taxonomies, $args );
 
 		$fields   = isset( $clauses['fields'] ) ? $clauses['fields'] : '';
 		$join     = isset( $clauses['join'] ) ? $clauses['join'] : '';
@@ -722,7 +722,16 @@ class WP_Term_Query {
 		$this->sql_clauses['orderby'] = $orderby ? "$orderby $order" : '';
 		$this->sql_clauses['limits']  = $limits;
 
-		$this->request = "{$this->sql_clauses['select']} {$this->sql_clauses['from']} {$where} {$this->sql_clauses['orderby']} {$this->sql_clauses['limits']}";
+		$this->request = implode(
+			' ',
+			array(
+				$this->sql_clauses['select'],
+				$this->sql_clauses['from'],
+				$where,
+				$this->sql_clauses['orderby'],
+				$this->sql_clauses['limits'],
+			)
+		);
 
 		$this->terms = null;
 
