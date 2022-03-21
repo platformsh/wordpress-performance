@@ -97,6 +97,16 @@ tests:
         assertions:
             - "metrics.wordpress.postdata_count.count <= 25"
 
+    "Counting found rows should be as limited as possible":
+        path: "/.*"
+        assertions:
+            - "metrics.wordpress.found_rows.count <= 5"
+
+    "Calls to WP_Query should stay limited":
+        path: "/.*"
+        assertions:
+            - "metrics.wordpress.wp_query.count <= 10"
+
 # Read more about writing scenarios at https://blackfire.io/docs/builds-cookbooks/scenarios
 scenarios: |
     #!blackfire-player
