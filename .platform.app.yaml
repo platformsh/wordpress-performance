@@ -13,10 +13,14 @@ build:
 
 dependencies:
     php:
-      composer/composer: '^2'
-      wp-cli/wp-cli-bundle: "^2.1"
-      # wp-cli/find-command: "dev-master"
-      psy/psysh: "^0.8.4"
+        composer/composer: '^2'
+        wp-cli/wp-cli-bundle: "^2.1"
+        # wp-cli/find-command: "dev-master"
+        psy/psysh: "^0.8.4"
+
+runtime:
+    extensions:
+        - blackfire
 
 hooks:
     build: |
@@ -31,14 +35,28 @@ hooks:
 
             cp ${directory+ -R } "${item}" "web/${item}"
         done
+        if [ ! -L "web/wp-content/mu-plugins" ]; then
+            $(cd web/wp-content && ln -nsf ../../.muplugins mu-plugins)
+        fi
+
     deploy: |
         # update the db if there were changes introduced in the last commit
         wp core update-db
         # Flush the object cache in case relevant changes were introduced in the last commit
         wp cache flush
-    post_deploy:
+    post_deploy: |
         #last run all the cron jobs that might have been schedules to run during the rebuild
         wp cron event run --due-now
+
+        if [ "$PLATFORM_ENVIRONMENT_TYPE" = "production" || $PSI_TEST_ENABLED = true ]; then
+            # run PageSpeed Insights test against the environment
+            # get default domain
+            export BASE_URL=$(echo $PLATFORM_ROUTES | base64 --decode | jq -r 'to_entries[] | select(.value.primary==true) | .key')
+            # get last commit hash
+            export COMMIT_HASH=$(cat last.commit)
+            # trigger test creation and reporting via external service api
+            curl -X POST --header 'Content-Type: application/json' -d '{"name": "'"$COMMIT_HASH"'","urls": ["'"$BASE_URL"'"]}' $GOOGLE_PSI_API_URL
+        fi
 
 # The relationships of the application with services or other applications.
 # The left-hand side is the name of the relationship as it will be exposed
@@ -74,7 +92,7 @@ web:
             scripts: false
             allow: false
         "/wp-content/uploads":
-            root: "wp-content/uploads"
+            root: "web/wp-content/uploads"
             scripts: false
             allow: false
             rules:
@@ -92,19 +110,24 @@ disk: 2048
 
 # The mounts that will be performed when the package is deployed.
 mounts:
-    "wp-content/cache":
+    "web/wp-content/cache":
         source: local
         source_path: "cache"
-    "wp-content/uploads":
+    "web/wp-content/uploads":
         source: local
         source_path: "uploads"
 
 source:
-  operations:
-    auto-update:
-      command: |
-        # dash is the default sh and <( is a bashism, so we have to execute the line in bash, so we can send output
-        # from curl to bash. my head hurts.
-        bash -c "bash <(curl -fsS https://raw.githubusercontent.com/gilzow/source-operations/main/setup.sh) sop-autoupdate"
-    test:
-      command: bash scripts/stage.sh sourceop
+    operations:
+        auto-update:
+            command: |
+                # dash is the default sh and <( is a bashism, so we have to execute the line in bash, so we can send output
+                # from curl to bash. my head hurts.
+                bash -c "bash <(curl -fsS https://raw.githubusercontent.com/gilzow/source-operations/main/setup.sh) sop-autoupdate"
+        test:
+            command: bash scripts/stage.sh sourceop
+
+variables:
+    env:
+        PSI_TEST_ENABLED: true
+        WP_TAG: 5.8.0
