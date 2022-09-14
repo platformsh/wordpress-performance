@@ -156,6 +156,10 @@ Inter variable font. Usage:
 
 /* Colors ------------------------------------ */
 
+.editor-styles-wrapper .has-text-color a {
+	color: inherit;
+}
+
 /* CUSTOM COLORS */
 
 :root .has-accent-color {
@@ -1108,6 +1112,10 @@ hr.wp-block-separator.is-style-dots::before {
 .editor-styles-wrapper ul ul,
 .editor-styles-wrapper ol ul {
 	padding-left: 1.3em;
+}
+
+.editor-styles-wrapper ul.block-editor-block-list__block.wp-block-social-links {
+	padding-left: 0;
 }
 
 /* Block: Post Template ---------------- */
